@@ -1,0 +1,86 @@
+<mvc:View controllerName="project1.controller.App"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:ndc="sap.ndc"
+    xmlns="sap.m"
+    >
+
+    <!-- App für Routing nötig -->
+    <App id="app">
+    <pages>
+        <Page
+            id="mainPage"
+            title="{i18n>appTitle}"
+            showNavButton="true"
+            navButtonPress=".onNavBack"
+        >
+            <content>
+                <VBox
+                    alignItems="Center"
+                    height="100%"
+                    class="sapUiContentPadding sapUiSmallMarginTop sapUiResponsiveMargin"
+                >
+                    <!-- Dynamischer Titel -->
+                    <Text
+                        text="{i18n>title}"
+                        class="sapUiResponsiveMargin sapUiTinyMarginTop sapUiTinyMarginBottom sapMTitleH3"
+                    />
+
+                    <!-- Handling Unit -->
+                    <VBox class="sapUiResponsiveMargin">
+                        <Label text="{i18n>huLabel}" />
+                        <HBox>
+                            <Input
+                                id="uhInput"
+                                type="Text"
+                                placeholder="{i18n>huPlaceholder}"
+                                required="true"
+                                width="20rem"
+                            />
+                            <ndc:BarcodeScannerButton
+                                id="btnScanHU"
+                                tooltip="{i18n>huTooltip}"
+                                scanSuccess=".onScanSuccessHU"
+                                scanFail=".onScanFail"
+                                class="sapUiSmallMarginBegin"
+                            />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Work Center -->
+                    <VBox class="sapUiResponsiveMargin">
+                        <Label text="{i18n>wcLabel}" />
+                        <HBox>
+                            <Input
+                                id="wcInput"
+                                type="Text"
+                                placeholder="{i18n>wcPlaceholder}"
+                                required="true"
+                                width="20rem"
+                            />
+                            <ndc:BarcodeScannerButton
+                                id="btnScanWC"
+                                tooltip="{i18n>wcTooltip}"
+                                scanSuccess=".onScanSuccessWC"
+                                scanFail=".onScanFail"
+                                class="sapUiSmallMarginBegin"
+                            />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Submit Button -->
+                    <HBox class="sapUiSmallMarginTop">
+                        <Button
+                            text="{i18n>submit}"
+                            type="Emphasized"
+                            press=".onSubmit"
+                            class="sapUiSmallMarginBegin"
+                        />
+                    </HBox>
+                </VBox>
+            </content>
+        </Page>
+    </pages>
+</App>
+
+</mvc:View>
