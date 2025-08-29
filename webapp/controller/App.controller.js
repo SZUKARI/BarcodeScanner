@@ -5,10 +5,7 @@ sap.ui.define(
 
     return Controller.extend("project1.controller.App", {
       _getText: function (sKey, aParams) {
-        return this.getView()
-          .getModel("i18n")
-          .getResourceBundle()
-          .getText(sKey, aParams);
+        return this.getView().getModel("i18n").getResourceBundle().getText(sKey, aParams);
       },
 
       onSubmit: function () {
@@ -22,16 +19,25 @@ sap.ui.define(
         }
 
         var oModel = oView.getModel();
-        var sPath = "/InspLotSet(HandlingUnit='" + encodeURIComponent(sHU) + "',WorkCenter='" + encodeURIComponent(sWC) + "')";
-        
+        var sPath = `/InspLotSet(IvHandlingUnit='${encodeURIComponent(sHU)}',IvWorkCenter='${encodeURIComponent(sWC)}')`;
+
         oModel.read(sPath, {
           success: function (oData) {
-            if (oData && oData.InspLotResult) {
-              var sInspectionLot = oData.InspLotResult;
+            // Prüfen auf EvErrorMessage zuerst
+            if (oData && oData.EvErrorMessage) {
+              MessageBox.error(oData.EvErrorMessage);
+              oView.byId("uhInput").setValue("");
+              oView.byId("wcInput").setValue("");
+              return;
+            }
+
+            // Wenn EvInspectionLot vorhanden → Navigation
+            if (oData && oData.EvInspectionLot) {
+              var sInspectionLot = oData.EvInspectionLot;
               MessageToast.show("Inspektionslos gefunden: " + sInspectionLot);
-              
+
               this._navigateToInspectionLotApp(sInspectionLot);
-              
+
               oView.byId("uhInput").setValue("");
               oView.byId("wcInput").setValue("");
             } else {
@@ -46,48 +52,26 @@ sap.ui.define(
         });
       },
 
-      // Korrekte Cross Application Navigation
-      _navigateToInspectionLotApp: function(sInspectionLot) {
-        // Prüfen ob wir im Fiori Launchpad sind
-        if (window.sap && window.sap.ushell && window.sap.ushell.Container) {
-          this._navigateWithCrossAppNav(sInspectionLot);
-        } else {
-    
-        }
-      },
-
-      _navigateToInspectionLotApp: async function(sInspectionLot) {
-        try {
-          // Prüfen ob wir im Fiori Launchpad sind
-          if (!Container) {
-            // this._navigateDirectly(sInspectionLot);
-            return;
+      _navigateToInspectionLotApp: async function (sInspectionLot) {
+        if (sap.ushell && sap.ushell.Container) {
+          try {
+            const oCrossAppNav = await sap.ushell.Container.getServiceAsync("CrossApplicationNavigation");
+            oCrossAppNav.toExternal({
+              target: {
+                semanticObject: "InspectionLot",
+                action: "manage"
+              },
+              params: {
+                "InspectionLot": sInspectionLot
+              }
+            });
+          } catch (err) {
+            console.error("Navigation Service Fehler:", err);
+            MessageBox.error("Fehler bei der Navigation: " + (err.message || err));
           }
-
-          // Navigation Service asynchron abrufen (wie in der Referenz)
-          const oNavigation = await Container.getServiceAsync("Navigation");
-          
-          // Href erstellen (Referenz-Syntax)
-          const sHref = await oNavigation.getHref({
-            target: {
-              semanticObject: "InspectionLot",  // Wahrscheinlichstes Semantic Object
-              action: "manage"                  // Wahrscheinlichste Action
-            },
-            params: {
-              "InspectionLot": sInspectionLot   // Parameter-Name anpassen falls nötig
-            }
-          }, this.getOwnerComponent());
-
-          console.log("Generierte URL:", sHref);
-          
-          // Mit der generierten URL navigieren
-          window.open(sHref, '_blank');
-          MessageToast.show("Navigation zur Inspection Lot App");
-          
-        } catch (oError) {
-          console.error("CrossAppNav Fehler:", oError);
-          MessageToast.show("CrossAppNav nicht verfügbar, verwende direkte Navigation");
-          
+        } else {
+          var sUrl = `https://d09.si-pro.de:44301/sap/bc/ui2/flp?sap-client=100&sap-language=EN#InspectionLot-manage?InspectionLot=${encodeURIComponent(sInspectionLot)}`;
+          window.location.href = sUrl;
         }
       },
 
@@ -104,11 +88,22 @@ sap.ui.define(
       },
 
       onScanFail: function (oEvent) {
-        MessageBox.error(
-          this._getText("scanFail", [oEvent.getParameter("message")])
-        );
+        MessageBox.error(this._getText("scanFail", [oEvent.getParameter("message")]));
       },
+      onNavBack: function () {
+        var oHistory = sap.ui.core.routing.History.getInstance();
+        var sPreviousHash = oHistory.getPreviousHash();
 
+        if (sPreviousHash !== undefined) {
+          window.history.go(-1);
+        } else {
+          sap.ushell.Container.getServiceAsync(
+            "CrossApplicationNavigation"
+          ).then(function (oCrossAppNav) {
+            oCrossAppNav.toExternal({ target: { shellHash: "#" } });
+          });
+        }
+      },
     });
   }
 );

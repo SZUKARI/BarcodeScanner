@@ -29,11 +29,15 @@
     "crossNavigation": {
       "inbounds": {
         "project1": {
-          "semanticObject": "HUWCInspection",
+          "semanticObject": "InspectionLot",
           "action": "manage",
           "title": "{{appTitle}}",
           "signature": {
-            "parameters": {}
+            "parameters": {
+              "InspectionLot": {
+                "required": true
+              }
+            }
           },
           "deviceTypes": {
             "desktop": true,
@@ -102,7 +106,6 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "project1.view",
         "async": true,
         "viewPath": "project1.view"
       }
