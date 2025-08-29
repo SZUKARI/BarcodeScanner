@@ -70,7 +70,7 @@ sap.ui.define(
             MessageBox.error("Fehler bei der Navigation: " + (err.message || err));
           }
         } else {
-          var sUrl = `https://d09.si-pro.de:44301/sap/bc/ui2/flp?sap-client=100&sap-language=EN#InspectionLot-manage?InspectionLot=${encodeURIComponent(sInspectionLot)}`;
+          var sUrl = `#InspectionLot-manage?InspectionLot=${encodeURIComponent(sInspectionLot)}`;
           window.location.href = sUrl;
         }
       },
