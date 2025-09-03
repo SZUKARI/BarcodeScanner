@@ -53,7 +53,7 @@ sap.ui.define(
       },
 
       _navigateToInspectionLotApp: async function (sInspectionLot) {
-        if (sap.ushell && sap.ushell.Container) {
+        //if (sap.ushell && sap.ushell.Container) {
           try {
             const oCrossAppNav = await sap.ushell.Container.getServiceAsync("CrossApplicationNavigation");
             oCrossAppNav.toExternal({
@@ -69,10 +69,10 @@ sap.ui.define(
             console.error("Navigation Service Fehler:", err);
             MessageBox.error("Fehler bei der Navigation: " + (err.message || err));
           }
-        } else {
-          var sUrl = `#InspectionLot-manage?InspectionLot=${encodeURIComponent(sInspectionLot)}`;
-          window.location.href = sUrl;
-        }
+       // } else {
+      //     var sUrl = `https://<servername>:<port>/sap/bc/ui2/flp#InspectionLot-manage?InspectionLot=${encodeURIComponent(sInspectionLot)}`;
+      //     window.location.href = sUrl;
+      //  }
       },
 
       onScanSuccessHU: function (oEvent) {
